@@ -17,8 +17,8 @@ By the end of this project, students should be able to:
 
 1. **Utilize Advanced DOM Manipulation Techniques:**
 
-- Create and manipulate dynamic content in a web application using JavaScript.
-- Understand and implement event-driven programming to enhance interactivity.
+    - Create and manipulate dynamic content in a web application using JavaScript.
+    - Understand and implement event-driven programming to enhance interactivity.
 
 2 **Implement and Use Web Storage:**
 
