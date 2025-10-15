@@ -20,7 +20,7 @@ By the end of this project, students should be able to:
     - Create and manipulate dynamic content in a web application using JavaScript.
     - Understand and implement event-driven programming to enhance interactivity.
 
-2 **Implement and Use Web Storage:**
+2. **Implement and Use Web Storage:**
 
     - Use local storage and session storage to persist data across browser sessions.
     - Implement functions to save, retrieve, and manage data stored in the browser.
