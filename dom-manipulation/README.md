@@ -22,15 +22,15 @@ By the end of this project, students should be able to:
 
 2 **Implement and Use Web Storage:**
 
-- Use local storage and session storage to persist data across browser sessions.
-- Implement functions to save, retrieve, and manage data stored in the browser.
+    - Use local storage and session storage to persist data across browser sessions.
+    - Implement functions to save, retrieve, and manage data stored in the browser.
 
 3. **Handle JSON Data:**
 
-- Import and export JSON data to and from web storage.
-- Manage JSON data effectively within a web application, ensuring data consistency and integrity.
+    - Import and export JSON data to and from web storage.
+    - Manage JSON data effectively within a web application, ensuring data consistency and integrity.
 
 4. **Filter and Sync Data:**
 
-- Implement dynamic content filtering based on user-selected criteria.
-- Sync local data with a server, handling potential conflicts and ensuring data consistency.
+    - Implement dynamic content filtering based on user-selected criteria.
+    - Sync local data with a server, handling potential conflicts and ensuring data consistency.
