@@ -80,10 +80,27 @@
     </style>
   </head>
   <body>
+
     <h1>Dynamic Quote Generator</Q></h1>
+
     <div id="quoteDisplay"></div>
+
     <button id="newQuote">Show New Quote</button>
+
     <div id="addQuoteForm"></div>
+
+    <hr style="width: 50%; border-color: #333; margin: 20px 0;">
+
+    <h2>Data Management</h2>
+    <div id="dataMangement">
+      <button onclick="exportToJsonFile()">Export Quotes (JSON)</button>
+
+      <label for="importFile" style="background-color: #0d1b2a; padding: 10px; border-radius: 5px; cursor: pointer;">
+        Import Quotes (JSON)
+      </label>
+
+      <input type="file" id="importFile" accept=".json" onchange="impotFromJsonFile(event)" style"display: none;">
+    </div>
     
     <script src="script.js"></script>
   </body>
