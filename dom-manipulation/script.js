@@ -1,29 +1,30 @@
 // Initial state: An array of quote objects
-let quotes = [
-  { text: "The only way to do great work is to love what you do.", category: "Work" },
-  { text: "Strive not to be a success, but rather to be of value.", category: "Motivation" },
-  { text: "If you can dream it, you can achieve it.", category: "Inspiration" },
-  { text: "The future belongs to those who believe in the beauty of their dreams.", category: "Dreams" },
-  { text: "Simplicity is the soul efficiency.", category: "Development" }
-];
+let quotes = [];
 
 // key for local storage
 const localStorageKey = 'dynamicQuotes';
+const localStorageFilterKey = 'lastSelectedFilter';
 const sessionStorageKey = 'lastViewedQuote';
 
 // Get references to the DOM elements we'll manipulate
 const quoteDisplay  = document.getElementById('quoteDisplay');
 const newQuoteButton = document.getElementById('newQuote');
 const addQuoteFormContainer = document.getElementById('addQuoteForm');
+const categoryFilter = document.getElementById('categoryFilter');
 
 
 // web storage integration
 function loadQuotes() {
-  const storedQuotes = localStorage.getItem(localStorageKey);
+  const defaultQuotes = [
+    { text: "The only way to do great work is to love what you do.", category: "Work" },
+    { text: "Strive not to be a success, but rather to be of value.", category: "Motivation" },
+    { text: "If you can dream it, you can achieve it.", category: "Inspiration" },
+    { text: "The future belongs to those who believe in the beauty of their dreams.", category: "Dreams" },
+    { text: "Simplicity is the soul efficiency.", category: "Development" }
+  ];
 
-  if (storedQuotes) {
-    quotes = JSON.parse(storedQuotes);
-  }
+  const storedQuotes = localStorage.getItem(localStorageKey);
+  quotes = storedQuotes ? JSON.parse(storedQuotes) : defaultQuotes;
 }
 
 function saveQuotes() {
@@ -31,21 +32,43 @@ function saveQuotes() {
   localStorage.setItem(localStorageKey, JSON.stringify(quotes)); 
 }
 
-function saveLastViewedQuote() {
-  sessionStorage.setItem(sessionStorageKey, quoteText);
-  console.log(`Session Storage: Last viewed quote saved: ${quoteText}`);
+function populateCategories() {
+
+  const uniqueCategories = new Set(quotes.map(quote => quote.category));
+
+  categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+
+  uniqueCategories.forEach(category => {
+    const option = document.createElement('option');
+    option.value = category;
+    option.textContent = category;
+    categoryFilter.appendChild(option);
+  });
+
+  const lastFilter = localStorage.getItem(localStorageFilterKey);
+  if (lastFilter) {
+    categoryFilter.value = lastFilter;
+  }
 }
 
+function filterQuotes() {
 
-function showRandomQuote() {
-  if (quotes.length === 0) {
-    quoteDisplay.innerHTML = '<p id="quoteText">No quotes available. Add one!</p>';
+  const selectedCategory = categoryFilter.value;
+
+  localStorage.setItem(localStorageFilterKey, selectedCategory);
+
+  const filteredQuotes = selectedCategory === 'all'
+    ? quotes
+    : quotes.filter(quote => quote.category === selectedCategory);
+
+  if (filteredQuotes.length === 0) {
+    quoteDisplay.innerHTML = `<p id="quoteText">No quotes found for category: ${selectedCategory}.</p>`;
     return;
   }
 
   // Get a random index
-  const randomIndex = Math.floor(Math.random() * quotes.length);
-  const quote = quotes[randomIndex];
+  const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+  const quote = filteredQuotes[randomIndex];
 
   // Clear existing content in the display container
   quoteDisplay.innerHTML = '';
@@ -57,12 +80,12 @@ function showRandomQuote() {
 
   const quoteCategoryElement = document.createElement('p');
   quoteCategoryElement.id = 'quoteCategory';
-  quoteCategoryElement.textContent = 'Category: ${quote.catgory}';
+  quoteCategoryElement.textContent = `Category: ${quote.category}`;
 
   quoteDisplay.appendChild(quoteTextElement);
-  quote.appendChild(quoteCategoryElement);
+  quoteDisplay.appendChild(quoteCategoryElement);
 
-  saveLastViewedQuote(quote.text);
+  sessionStorageKey.setItem(sessionStorageKey, quote.textContent);
 }
 
 function addQuote() {
@@ -76,15 +99,16 @@ function addQuote() {
 
     saveQuotes();
 
+    populateCategories();
+
     // update the DOM (clear inputs)
     document.getElementById('newQuoteText').value = '';
     document.getElementById('newQuoteCategory').value = '';
 
-    console.log("New quote added successfully! Array size:", quotes.length);
+    categoryFilter.value = newCategory;
+    filterQuotes();
 
-    //  optional: show the newly added quote immediately
-    showRandomQuote();
-    alert(`Quote added! Your app now has ${quotes.length}`)
+    alert(`Quote added and filter set to ${newCategory}!`)
   } else {
     alert("Please enter both a quote and a category!");
   }
@@ -106,7 +130,7 @@ function createAddQuoteForm() {
   const categoryInput = document.createElement('input');
   categoryInput.id = 'newQuoteCategory';
   categoryInput.type = 'text';
-  category.placeholder = 'Enter quote Category';
+  categoryInput.placeholder = 'Enter quote Category';
 
   // create the add quote button
   const addButton = document.createElement('button');
@@ -179,9 +203,12 @@ function importFromJsonFile(event) {
 
 loadQuotes();
 
+populateCategories();
+
 // attach the event listener to the "show new quote" button
-newQuoteButton.addEventListener('click', showRandomQuote);
+newQuoteButton.addEventListener('click', filterQuotes);
 
 // run the two main functions on paage load:
-showRandomQuote();
 createAddQuoteForm();
+
+filterQuotes();
