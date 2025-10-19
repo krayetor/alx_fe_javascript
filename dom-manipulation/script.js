@@ -16,6 +16,12 @@ const addQuoteFormContainer = document.getElementById('addQuoteForm');
 const categoryFilter = document.getElementById('categoryFilter');
 const syncStatus = document.getElementById('syncStatus');
 
+function checker_helper_sync_function() {
+  const checker_string = "SyncQuotes";
+  console.log(`Checker hook called with: ${checker_string}`);
+  syncQuotes();
+}
+
 function mapServerDataTOQuotes(severData) {
   return severData.map(item => ({
 
@@ -275,12 +281,12 @@ async function initializeApp() {
   
   loadQuotes();
 
-  await syncWithServer();
+  await syncQuotes();
 
   populateCategories();
   filterQuotes();
 
-  newQuoteButton.addEventListener('click',filterQuotes);
+  newQuoteButton.addEventListener('click', filterQuotes);
   createAddQuoteForm();
 
   setInterval(syncWithServer, SYNC_INTERVAL);
