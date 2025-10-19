@@ -147,26 +147,63 @@ function filterQuotes() {
   sessionStorageKey.setItem(sessionStorageKey, quote.textContent);
 }
 
-function addQuote() {
+ async function addQuote() {
   const newText = document.getElementById('newQuoteText').value.trim();
   const newCategory = document.getElementById('newQuoteCategory').value.trim();
 
   if (newText && newCategory) {
-    quotes.push({ text: newText, category: newCategory });
+    // prepare the new quote object
+    const newQuote = {
+      text: newText,
+      category: newCategory,
+      id: `local-${Date.now()}` // temporary local ID
+    };
+
+    // 1. simulate POST request to the server
+    try {
+      const postResponse = await fetch('https://jsonplaceholder.typicode.com/posts', {
+        // required: set the request method to POST
+        method: 'POST',
+        // required: specify that we are sending JSON data
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // send the data as a string
+        body: JSON.stringify({
+          title: newText,   // map text to 'title' for the mock API
+          userId: 1,        // required by the mock API
+        }),
+      });
+
+      // note: in a real quote app, you would use the server's response to update the local ID
+      // for now, we just ensure the request was successful
+      if (postResponse.ok) {
+        console.log('Quote successfully posted to mock server.');
+        syncStatus.textContent = 'Sync Status: Quote posted. ✅';
+      } else {
+        console.warn('Quote posted locally, but server response failed.', postResponse.status);
+        syncStatus.textContent = 'Sync Status: Post failed (local saved). ⚠️';
+      }
+    } catch (error) {
+      console.error('Error during Post request:', error);
+      syncStatus.textContent = 'Sync Status: Post failed (local saved). ⚠️';
+    }
+
+    // 2. update the local state
+    quotes.push(newQuote);
 
     saveQuotes();
     populateCategories();
 
     document.getElementById('newQuoteText').value = '';
-    document,getElementById('newQuoteCategory').value = '';
+    document.getElementById('newQuoteCategory').value = '';
 
     categoryFilter.value = newCategory;
     filterQuotes();
 
     alert(`Quote added and filter set to ${newCategory}!`);
-
   } else {
-    alert("Please enter a quote and a category");
+    alert("Please enter both quote and a category!");
   }
 }
 
