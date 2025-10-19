@@ -27,18 +27,28 @@ function mapServerDataTOQuotes(severData) {
   }));
 }
 
-async function syncWithServer() {
+async function fetchQuotesFromServer() {
   try {
-    syncStatus.textContent = 'Sync Status: Syncing... 🔄';
-
     const response = await fetch(SERVER_API_URL);
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
     const serverData = await response.json();
-    const serverQuotes = mapServerDataTOQuotes(serverData);
+    return mapServerDataTOQuotes(serverData);
+  } catch {
+    console.error('Server fetch failed:', error);
+    throw  error;
+  }
+}
 
-    const serverIds = new Set(serverData.map(q => q.id));
+async function syncWithServer() {
+   syncStatus.textContent = 'Sync Status: Syncing... 🔄';
+
+  try {
+
+    const serverQuotes = await fetchQuotesFromServer();
+
+    const serverIds = new Set(serverQuotes.map(q => q.id));
 
     let mergedQuotes = quotes.filter(q => !serverIds.has(q.id));
 
@@ -57,7 +67,6 @@ async function syncWithServer() {
       syncStatus.textContent = 'Sync Status: UP to date. 🟢';
     }
   } catch {
-    console.error('Server sync failed:', error);
     syncStatus.textContent = 'Sync Stauts: Failed. Check connection. 🔴';
   }
 }
@@ -136,6 +145,93 @@ function filterQuotes() {
   quoteDisplay.appendChild(quoteCategoryElement);
 
   sessionStorageKey.setItem(sessionStorageKey, quote.textContent);
+}
+
+function addQuote() {
+  const newText = document.getElementById('newQuoteText').value.trim();
+  const newCategory = document.getElementById('newQuoteCategory').value.trim();
+
+  if (newText && newCategory) {
+    quotes.push({ text: newText, category: newCategory });
+
+    saveQuotes();
+    populateCategories();
+
+    document.getElementById('newQuoteText').value = '';
+    document,getElementById('newQuoteCategory').value = '';
+
+    categoryFilter.value = newCategory;
+    filterQuotes();
+
+    alert(`Quote added and filter set to ${newCategory}!`);
+
+  } else {
+    alert("Please enter a quote and a category");
+  }
+}
+
+function createAddQuoteForm() {
+  if (addQuoteFormContainer.innerHTML !== '') return;
+
+  const formDiv = document.createElement('div');
+  const textInput = document.createElement('input');
+  textInput.id = 'newQuoteText';
+  textInput.type = 'text';
+  textInput.placeholder = 'Enter a new quote';
+
+  const categoryInput = document.createElement('input');
+  categoryInput.id = 'newQuoteCategory';
+  categoryInput.type = 'text';
+  categoryInput.placeholder = 'Enter quote Category';
+  
+  const addButton = document.createElement('button');
+  addButton.textContent = 'Add Quote';
+  addButton.onclick = addQuote;
+
+  formDiv.appendChild(textInput);
+  formDiv.appendChild(categoryInput);
+  formDiv.appendChild(addButton);
+
+  addQuoteFormContainer.appendChild(formDiv);
+}
+
+function exportToJsonFile() {
+
+  const dataStr = JSON.stringify(quotes, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+
+  link.href = url;
+  link.download = 'quotes_export.json';
+  document.body.appendChild(link);
+
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  alert('Quotes exported successfully!');
+}
+
+function importFromJsonFile() {
+  const fileReader = new FileReader();
+  fileReader.onload = function(event) {
+    try {
+      const importedQuotes = JSON.parse(event.target.result);
+      quotes.push(...importedQuotes);
+
+      saveQuotes();
+      populateCategories();
+      filterQuotes();
+
+      alert(`Quotes imported successfully! Total quotes now: ${quotes.length}`);
+    } catch (e) {
+      alert('Error importing file. Please ensure it is a valid JSON format.');
+      console.error(e);
+    }
+  };
+  if (event.target.files && event,target.files.length > 0) {
+    fileReader.readAsText(event.target.files[0]);
+  }
 }
 
 async function initializeApp() {
