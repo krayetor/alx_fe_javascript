@@ -41,7 +41,7 @@ async function fetchQuotesFromServer() {
   }
 }
 
-async function syncWithServer() {
+async function syncQuotes() {
    syncStatus.textContent = 'Sync Status: Syncing... 🔄';
 
   try {
@@ -147,7 +147,7 @@ function filterQuotes() {
   sessionStorageKey.setItem(sessionStorageKey, quote.textContent);
 }
 
- async function addQuote() {
+async function addQuote() {
   const newText = document.getElementById('newQuoteText').value.trim();
   const newCategory = document.getElementById('newQuoteCategory').value.trim();
 
