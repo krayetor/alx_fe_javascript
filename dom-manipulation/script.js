@@ -6,7 +6,7 @@ const localStorageKey = 'dynamicQuotes';
 const localStorageFilterKey = 'lastSelectedFilter';
 const sessionStorageKey = 'lastViewedQuote';
 
-const SERVER_API_URL = 'https://jsonplaceholder.typicode.com/todos?_limit=10';
+const SERVER_API_URL = 'https://jsonplaceholder.typicode.com/posts?_limit=10';
 const SYNC_INTERVAL = 30000;
 
 // Get references to the DOM elements we'll manipulate
@@ -21,7 +21,7 @@ function mapServerDataTOQuotes(severData) {
 
     text: item.title,
 
-    category: `Server-${item.userId % 3 === 0 ? 'Classic' : 'Modern'}`,
+    category: `Post Title: ${item.title.substring(0, 15)}...`,
 
     id: `server-${item.id}`
   }));
