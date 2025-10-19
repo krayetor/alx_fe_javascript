@@ -22,7 +22,7 @@ function checker_helper_sync_function() {
   syncQuotes();
 }
 
-function mapServerDataTOQuotes(severData) {
+function mapServerDataToQuotes(severData) {
   return severData.map(item => ({
 
     text: item.title,
@@ -40,7 +40,7 @@ async function fetchQuotesFromServer() {
       throw new Error('Network response was not ok');
     }
     const serverData = await response.json();
-    return mapServerDataTOQuotes(serverData);
+    return mapServerDataToQuotes(serverData);
   } catch {
     console.error('Server fetch failed:', error);
     throw  error;
@@ -55,9 +55,7 @@ async function syncQuotes() {
     const serverQuotes = await fetchQuotesFromServer();
 
     const serverIds = new Set(serverQuotes.map(q => q.id));
-
     let mergedQuotes = quotes.filter(q => !serverIds.has(q.id));
-
     mergedQuotes.push(...serverQuotes);
 
     const isDataChanged = mergedQuotes.length !== quotes.length;
@@ -68,12 +66,14 @@ async function syncQuotes() {
     filterQuotes();
 
     if (isDataChanged) {
-      syncStatus.textContent = `Sync Status: Success! Data merged (${quoteDisplay.length} total). ✅`;
+      // fix: use the required string for a  successful sync notification
+      syncStatus.textContent = `Quotes synced with server! Data merged (${quoteDisplay.length} total). ✅`;
     } else {
-      syncStatus.textContent = 'Sync Status: UP to date. 🟢';
+      // fix: use the required string for a successful sync notification even if no change
+      syncStatus.textContent = `Quotes synced with server! No new changes.  🟢`;
     }
   } catch {
-    syncStatus.textContent = 'Sync Stauts: Failed. Check connection. 🔴';
+    syncStatus.textContent = 'Sync Status: Failed. Check connection. 🔴';
   }
 }
 
